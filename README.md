@@ -1,12 +1,14 @@
 
-[![Travis build
-status](https://travis-ci.com/martakarass/adept.svg?branch=master)](https://travis-ci.com/martakarass/adept)
-[![AppVeyor build
-status](https://ci.appveyor.com/api/projects/status/github/martakarass/adept?branch=master&svg=true)](https://ci.appveyor.com/project/martakarass/adept)
-[![Coverage
-status](https://codecov.io/gh/martakarass/adept/branch/master/graph/badge.svg)](https://codecov.io/github/martakarass/adept?branch=master)
+<!-- [![Coverage status](https://codecov.io/gh/martakarass/adept/branch/master/graph/badge.svg)](https://codecov.io/github/martakarass/adept?branch=master) -->
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+[![CRAN
+status](https://www.r-pkg.org/badges/version/adept)](https://CRAN.R-project.org/package=adept)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/adept)](https://cran.r-project.org/package=adept)
+[![](https://cranlogs.r-pkg.org/badges/last-month/adept)](https://cran.r-project.org/package=adept)
+[![R build
+status](https://github.com/martakarass/adept/workflows/R-CMD-check/badge.svg)](https://github.com/martakarass/adept/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/martakarass/adept/branch/master/graph/badge.svg)](https://codecov.io/gh/martakarass/adept?branch=master)
 
 ### Overview
 
@@ -62,13 +64,13 @@ segmentPattern(
 #> 1      4  95 0.9987941          1
 #> 2     98 103 0.9992482          1
 #> 3    202  95 0.9987941          1
-#> 4    297 103 0.9992482          1
-#> 5    399  95 0.9987941          1
-#> 6    495 103 0.9992482          1
-#> 7    597  95 0.9987941          1
-#> 8    697  95 0.9987941          1
-#> 9    792 103 0.9992482          1
-#> 10   894  95 0.9987941          1
+#> 4    296 103 0.9992482          1
+#> 5    400  95 0.9987941          1
+#> 6    494 103 0.9992482          1
+#> 7    598  95 0.9987941          1
+#> 8    692 103 0.9992482          1
+#> 9    796  95 0.9987941          1
+#> 10   895  95 0.9987941          1
 ```
 
 The segmentation result is a data frame, where each row describes one
@@ -247,7 +249,7 @@ segmentPattern(
 
 ### Vignettes
 
-Vignettes are available to better demonstrate package methods usgae.
+Vignettes are available to better demonstrate package methods usage.
 
 1.  Vignette [Introduction to adept
     package](https://martakarass.github.io/adept/articles/adept-intro.html)

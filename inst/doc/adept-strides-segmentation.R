@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -11,13 +11,13 @@ run_local <- FALSE
 # run_local <- FALSE
 # wd.tmp <- "/Users/martakaras/Dropbox/_PROJECTS/R/adept/vignettes/"
 
-## ----echo=FALSE, out.width='90%'-----------------------------------------
+## ----echo=FALSE, out.width='90%'----------------------------------------------
 knitr::include_graphics('https://imgur.com/VcK6o7o.jpg')
 
-## ----echo=FALSE, out.width='45%'-----------------------------------------
+## ----echo=FALSE, out.width='45%'----------------------------------------------
 knitr::include_graphics('https://imgur.com/5Ji2hQF.jpg');knitr::include_graphics('https://imgur.com/lTdCixX.jpg')
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # devtools::install_github("martakarass/adept")
 library(adept)
 library(adeptdata)
@@ -26,7 +26,7 @@ options(digits.secs = 2)
 head(acc_running)
 tz(acc_running$date_time)
 
-## ----plot_xyz, fig.width=7.5, fig.height=4.5-----------------------------
+## ----plot_xyz, fig.width=7.5, fig.height=4.5----------------------------------
 library(lubridate)
 library(dplyr)
 library(ggplot2)
@@ -64,7 +64,7 @@ acc_running_sub %>%
   theme(legend.position = "top")
 
 
-## ----plot_vm, fig.width=7.5, fig.height=4.1------------------------------
+## ----plot_vm, fig.width=7.5, fig.height=4.1-----------------------------------
 ## Plot vector magnitude values 
 acc_running_sub %>%
   mutate(dt_floor = paste0(
@@ -76,7 +76,7 @@ acc_running_sub %>%
   labs(x = "Time [s]", y = "Vector magnitue [g]", 
        title = "Vector magnitude (vm) summary of raw accelerometry data") 
 
-## ----plot_vmc, fig.width=7.5, fig.height=4.2-----------------------------
+## ----plot_vmc, fig.width=7.5, fig.height=4.2----------------------------------
 ## Function to compute vmc from a vm window vector
 vmc <- function(vm.win){
   mean(abs(vm.win - mean(vm.win)))
@@ -122,14 +122,14 @@ vmc.df %>%
 ## Time percentage when (vmc) computed from left ankle is below 0.4
 (vmc.low.frac <- mean(vmc.df.rest$resting))
 
-## ----segm_la, fig.width=6, fig.height=3----------------------------------
+## ----segm_la, fig.width=6, fig.height=3---------------------------------------
 template <- list(stride_template$left_ankle[[2]][1, ],
                  stride_template$left_ankle[[2]][2, ])
 par(mfrow = c(1,2), cex = 0.7)
 plot(template[[1]], type = "l", xlab = "", ylab = "", main = "Left ankle: template 1")
 plot(template[[2]], type = "l", xlab = "", ylab = "", main = "Left ankle: template 2")
 
-## ----segm_la2, eval = !run_local-----------------------------------------
+## ----segm_la2, eval = !run_local----------------------------------------------
 x.la <- acc_running$vm[acc_running$loc_id == "left_ankle"]
 out1.la <- segmentPattern(
   x = x.la,
@@ -144,29 +144,29 @@ out1.la <- segmentPattern(
   compute.template.idx = TRUE,
   run.parallel = TRUE)
 
-## ---- eval =  FALSE, include = FALSE-------------------------------------
+## ---- eval =  FALSE, include = FALSE------------------------------------------
 #  ## Run only manually, when some changes have been introduced and file needs to be updated
 #  # setwd(wd.tmp)
 #  path.tmp <- "static/results/out1_la.csv"
 #  write.csv(out1.la, path.tmp, row.names = FALSE)
 
-## ----  include = FALSE, eval = run_local---------------------------------
+## ----  include = FALSE, eval = run_local--------------------------------------
 #  ## Run only when executed locally
 #  path.tmp <- "static/results/out1_la.csv"
 #  x.la <- acc_running$vm[acc_running$loc_id == "left_ankle"]
 #  out1.la <- read.csv(path.tmp)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(out1.la)
 
-## ----segm_lh, fig.width=6, fig.height=3----------------------------------
+## ----segm_lh, fig.width=6, fig.height=3---------------------------------------
 template <- list(stride_template$left_hip[[1]][1, ],
                  stride_template$left_hip[[2]][2, ])
 par(mfrow = c(1,2), cex = 0.7)
 plot(template[[1]], type = "l", xlab = "", ylab = "", main = "Left hip: template 1")
 plot(template[[2]], type = "l", xlab = "", ylab = "", main = "Left hip: template 2")
 
-## ----segm_lh2, eval = !run_local-----------------------------------------
+## ----segm_lh2, eval = !run_local----------------------------------------------
 template <- list(stride_template$left_hip[[1]][1, ],
                  stride_template$left_hip[[2]][2, ])
 x.lh <- acc_running$vm[acc_running$loc_id == "left_hip"]
@@ -182,20 +182,20 @@ out1.lh <- segmentPattern(x = x.lh,
                           compute.template.idx = TRUE,
                           run.parallel = TRUE)
 
-## ---- eval = FALSE, include=FALSE----------------------------------------
+## ---- eval = FALSE, include=FALSE---------------------------------------------
 #  # setwd(wd.tmp)
 #  path.tmp <- "static/results/out1_lh.csv"
 #  write.csv(out1.lh, path.tmp, row.names = FALSE)
 
-## ---- eval = run_local, include = FALSE----------------------------------
+## ---- eval = run_local, include = FALSE---------------------------------------
 #  x.lh <- acc_running$vm[acc_running$loc_id == "left_hip"]
 #  path.tmp <- "static/results/out1_lh.csv"
 #  out1.lh <- read.csv(path.tmp)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 head(out1.lh)
 
-## ---- fig.width=7, fig.height=4------------------------------------------
+## ---- fig.width=7, fig.height=4-----------------------------------------------
 ## Merge results from two sensor locations, add resting/non-resting info
 plt.df.la <- 
   out1.la %>% 
@@ -225,7 +225,7 @@ ggplot(plt.df,
         legend.background = element_rect(fill = "grey90")) + 
   scale_y_continuous(limits = c(0.5, 1.8))
 
-## ----extract_subject_specific_sp, eval = !run_local----------------------
+## ----extract_subject_specific_sp, eval = !run_local---------------------------
 ## For data frame #1 (raw vm segments)
 stride.acc.vec.la <- numeric()
 stride.tau_i.vec.la <- numeric()
@@ -263,7 +263,7 @@ stride_S.df.la <- data.frame(acc = stride_S.acc.vec.la,
                              tau_i = stride_S.tau_i.vec.la,
                              phase = stride_S.phase.vec.la)
 
-## ---- eval = FALSE, include = FALSE--------------------------------------
+## ---- eval = FALSE, include = FALSE-------------------------------------------
 #  # setwd(wd.tmp)
 #  
 #  ## For data frame #1
@@ -274,7 +274,7 @@ stride_S.df.la <- data.frame(acc = stride_S.acc.vec.la,
 #  path.tmp <- "static/results/stride_S_df_la.csv"
 #  write.csv(stride_S.df.la, path.tmp, row.names = FALSE)
 
-## ---- eval = run_local, include = FALSE----------------------------------
+## ---- eval = run_local, include = FALSE---------------------------------------
 #  ## For data frame #1
 #  path.tmp <- "static/results/stride_df_la.csv"
 #  stride.df.la <- read.csv(path.tmp)
@@ -283,7 +283,7 @@ stride_S.df.la <- data.frame(acc = stride_S.acc.vec.la,
 #  path.tmp <- "static/results/stride_S_df_la.csv"
 #  stride_S.df.la <- read.csv(path.tmp)
 
-## ----plot_subject_specific_sp, fig.width=7, fig.height=3-----------------
+## ----plot_subject_specific_sp, fig.width=7, fig.height=3----------------------
 ## Plot segmented walking strides
 plt1 <- 
   stride.df.la %>%
@@ -301,7 +301,7 @@ plt2 <-
        title = "Segmented walking strides, aligned and scaled") 
 grid.arrange(plt1, plt2, nrow = 1)
 
-## ----correlation_clustering, eval = !run_local---------------------------
+## ----correlation_clustering, eval = !run_local--------------------------------
 ## Compute strides distance martrix
 stride_S.dfdc.la <- dcast(stride_S.df.la, phase ~ tau_i, value.var = "acc")[, -1]
 data.mat.tau_i <- as.numeric(colnames(stride_S.dfdc.la))
@@ -327,17 +327,17 @@ data.dfm <- melt(data.df, id.vars = c("tau_i", "cluster"))
 data.dfm$variable <- as.numeric(as.character(data.dfm$variable))
 data.dfm$cluster <- paste0("cluster ", data.dfm$cluster)
 
-## ---- eval = FALSE, include=FALSE----------------------------------------
+## ---- eval = FALSE, include=FALSE---------------------------------------------
 #  # setwd(wd.tmp)
 #  
 #  path.tmp <- "static/results/data_dfm.csv"
 #  write.csv(data.dfm, path.tmp, row.names = FALSE)
 
-## ---- eval = run_local, include = FALSE----------------------------------
+## ---- eval = run_local, include = FALSE---------------------------------------
 #  path.tmp <- "static/results/data_dfm.csv"
 #  data.dfm <- read.csv(path.tmp)
 
-## ----plot_correlation_clustering, fig.width=4, fig.height=5.5------------
+## ----plot_correlation_clustering, fig.width=4, fig.height=5.5-----------------
 data.dfm.agg <- 
   data.dfm %>%
   group_by(variable, cluster) %>% 
@@ -351,7 +351,7 @@ ggplot(data.dfm, aes(x = variable, y = value, group = tau_i)) +
   labs(x = "Stride pattern phase", y = "Vector magnitude (scaled) [g]",
        title = "Segmented walking strides, aligned, scaled, clustered\nRed line: point-wise mean") 
 
-## ----correlation_clustering_2, fig.width=7, fig.height=2.8---------------
+## ----correlation_clustering_2, fig.width=7, fig.height=2.8--------------------
 data.dfm %>%
   select(tau_i, cluster)  %>%
   distinct() %>%
@@ -370,7 +370,7 @@ data.dfm %>%
         legend.background = element_rect(fill = "grey90"))  + 
   scale_y_continuous(limits = c(0.5, 1.8))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Function to compute local maxima
 ## source: https://stackoverflow.com/questions/6836409/finding-local-maxima-and-minima
 localMaxima <- function(x) {
@@ -410,7 +410,7 @@ acc_running_sub2 <-
 ## Vector of signatures for data parts of different speed of running
 dt_floor.unique <- unique(acc_running_sub2$dt_floor)
 
-## ----semi_manual_la, fig.width = 7, fig.height=2.3-----------------------
+## ----semi_manual_la, fig.width = 7, fig.height=2.3----------------------------
 ## Left ankle-specific subset of data  
 sub.la <- acc_running_sub2[acc_running_sub2$loc_id == "left_ankle", ]
 par(mfrow = c(1,3), cex = 0.6)
@@ -439,7 +439,7 @@ plot(1:length(template.la.x2), template.la.x2, type = "l",
 ## Template object
 template.la <- list(template.la.x1, template.la.x2)
 
-## ----semi_manual_lh, fig.width = 7, fig.height=2.3-----------------------
+## ----semi_manual_lh, fig.width = 7, fig.height=2.3----------------------------
 ## Left hip-specific subset of data  
 sub.lh <- acc_running_sub2[acc_running_sub2$loc_id == "left_hip", ]
 par(mfrow = c(1,3), cex = 0.6)
@@ -468,7 +468,7 @@ plot(1:length(template.lh.x2), template.lh.x2, type = "l",
 ## Template object
 template.lh <- list(template.lh.x1, template.lh.x2)
 
-## ----segm_app2_la2, eval = !run_local------------------------------------
+## ----segm_app2_la2, eval = !run_local-----------------------------------------
 out2.la <- segmentPattern(x = x.la,
                           x.fs = 100,
                           template = template.la,
@@ -493,7 +493,7 @@ out2.lh <- segmentPattern(x = x.lh,
                           compute.template.idx = TRUE,
                           run.parallel = TRUE)
 
-## ---- eval = FALSE, include=FALSE----------------------------------------
+## ---- eval = FALSE, include=FALSE---------------------------------------------
 #  # setwd(wd.tmp)
 #  
 #  path.tmp <- "static/results/out2_la.csv"
@@ -502,14 +502,14 @@ out2.lh <- segmentPattern(x = x.lh,
 #  path.tmp <- "static/results/out2_lh.csv"
 #  write.csv(out2.lh, path.tmp, row.names = FALSE)
 
-## ---- eval = run_local, include=FALSE------------------------------------
+## ---- eval = run_local, include=FALSE-----------------------------------------
 #  path.tmp <- "static/results/out2_la.csv"
 #  out2.la <- read.csv(path.tmp)
 #  
 #  path.tmp <- "static/results/out2_lh.csv"
 #  out2.lh <- read.csv(path.tmp)
 
-## ---- fig.width=7, fig.height=4------------------------------------------
+## ---- fig.width=7, fig.height=4-----------------------------------------------
 ## Merge results from two sensor locations, add resting/non-resting info
 plt.df.la.2 <- 
   out2.la %>% 

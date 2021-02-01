@@ -47,13 +47,11 @@
 #' fine-tuning procedure. Expressed in seconds. Default is \code{NULL}.
 #' Note: if the length provided corresponds to an even number of \code{x} vector indices,
 #' it will be rounded down so as the corresponding number of vector indices is its closest odd number.
-#' @param run.parallel A logical scalar. Whether or not to use parallel execution in the algorithm.
-#' The \code{future} package
-#' is used to execute code asynchronously. Default is \code{FALSE}.
+#' @param run.parallel A logical scalar. Whether or not to use parallel execution in the algorithm
+#' with \code{parallel} package. Default is \code{FALSE}. DOES NOT WORK ON WINDOWS.
 #' @param run.parallel.cores An integer scalar.
-#' The number of cores to use for parallel execution.
-#' Default is \code{NULL}. If not specified, the number of cores is set to a number of
-#' cores available minus 1.
+#' The number of cores to use for parallel execution. Defaults to 1L (no parallel).
+#' DOES NOT WORK ON WINDOWS.
 #' @param x.cut  A logical scalar. Whether or not to use time optimization procedure in
 #' which a time-series \code{x} is cut into parts and segmentation is performed for
 #' each part of \code{x} separately. Recommended for a time-series \code{x} of vector length
@@ -67,7 +65,7 @@
 #' Setting to \code{TRUE} may increase computation time. Default is \code{FALSE}.
 #'
 #' @details
-#'     Function implements Adaptive Empirical Pattern Transformation (ADEPT) method for pattern segmentation
+#' Function implements Adaptive Empirical Pattern Transformation (ADEPT) method for pattern segmentation
 #' from a time-series \code{x}.
 #' ADEPT is optimized to perform fast, accurate walking strides segmentation from
 #' high-density data collected with a wearable accelerometer during walking.
@@ -93,9 +91,15 @@
 #'
 #' @export
 #'
-#' @import future
 #' @importFrom dplyr arrange mutate lag filter select
 #' @importFrom magrittr '%>%'
+#' @importFrom parallel mclapply
+#'
+#' @references
+#' Karas, M., Straczkiewicz, M., Fadel, W., Harezlak, J., Crainiceanu, C.M.,
+#' Urbanek, J.K. (2019). Adaptive empirical pattern
+#' transformation (ADEPT) with application to walking stride segmentation.
+#' Biostatistics. https://doi.org/10.1093/biostatistics/kxz033
 #'
 #' @examples
 #' ## Example 1: Simulate a time-series `x`. Assume that
@@ -223,12 +227,13 @@ segmentPattern <- function(x,
                            finetune.maxima.ma.W = NULL,
                            finetune.maxima.nbh.W = NULL,
                            run.parallel = FALSE,
-                           run.parallel.cores = NULL,
+                           run.parallel.cores = 1L,
                            x.cut = TRUE,
                            x.cut.vl = 6000,
                            compute.template.idx = FALSE){
 
 
+  ## ---------------------------------------------------------------------------
   ## Check if correct objects were passed to the function
   x.cut.vl <- as.integer(x.cut.vl)
   if(!is.null(run.parallel.cores)) run.parallel.cores <-  as.integer(run.parallel.cores)
@@ -248,6 +253,7 @@ segmentPattern <- function(x,
   if (!(length(x.cut) == 1 & x.cut %in% c(TRUE, FALSE))) stop("x.cut must be a logical scalar.")
   if (!(is.null(x.cut.vl) || (length(x.cut.vl) == 1 & is.integer(x.cut.vl) & x.cut.vl > 0))) stop("x.cut.vl must me NULL or a positive integer scalar")
   if (!(length(compute.template.idx) == 1 & compute.template.idx %in% c(TRUE, FALSE))) stop("compute.template.idx must be a logical scalar.")
+
 
   ## ---------------------------------------------------------------------------
   ## Compute a list of rescaled template(s)
@@ -292,7 +298,9 @@ segmentPattern <- function(x,
 
     ## Other fine-tuning components
     if (!(finetune.maxima.nbh.W > 0)) stop("finetune.maxima.nbh.W should be greater than 0 for finetune == 'maxima'")
-    finetune.maxima.nbh.vl <- finetune.maxima.nbh.W * x.fs
+    ## Added round() @MK 2020-01-06
+    finetune.maxima.nbh.vl <- round(finetune.maxima.nbh.W * x.fs)
+    if (!(finetune.maxima.nbh.vl > 0)) stop("finetune.maxima.nbh.W should be greater")
   }
 
 
@@ -310,61 +318,55 @@ segmentPattern <- function(x,
 
   template.idx.mat.i <- NULL
 
-  if (run.parallel){
-    ## multiproces := multicore, if supported, otherwise multisession
-    if (is.null(run.parallel.cores)) run.parallel.cores <- availableCores() - 1
-    plan(multiprocess, workers = run.parallel.cores)
-  } else {
-    plan(sequential)
-  }
+  # If you were to run this code on Windows, mclapply would simply call lapply,
+  # so the code works but sees no speed gain.
+  # source: http://dept.stat.lsa.umich.edu/~jerrick/courses/stat701/notes/parallel.html
 
-  out.list.f <- lapply(x.cut.seq, function(i){
-    future({
-      ## Define current x part indices
-      idx.i <- i : min((i + x.cut.vl + x.cut.margin), length(x))
-      ## If we cannot fit the longest pattern, return NULL
-      if (length(idx.i) <= max(template.vl)) return(NULL)
-      ## Compute similarity matrix
-      similarity.mat.i <- similarityMatrix(x = x.smoothed[idx.i],
-                                           template.scaled = template.scaled,
-                                           similarity.measure = similarity.measure)
-      ## Compute template index matrix
-      if (compute.template.idx){
-        template.idx.mat.i <- templateIdxMatrix(x = x.smoothed[idx.i],
-                                                template.scaled = template.scaled,
-                                                similarity.measure = similarity.measure)
-      }
-      else
-      {
-        template.idx.mat.i <- NULL
-      }
-      ## Run max and tine procedure
-      out.df.i <- maxAndTune(x = x[idx.i],
-                             template.vl = template.vl,
-                             similarity.mat = similarity.mat.i,
-                             similarity.measure.thresh = similarity.measure.thresh,
-                             template.idx.mat = template.idx.mat.i,
-                             finetune = finetune,
-                             finetune.maxima.x = finetune.maxima.x[idx.i],
-                             finetune.maxima.nbh.vl = finetune.maxima.nbh.vl)
+  # define number of cores to use in parallel
+  mc.cores.val <- ifelse (run.parallel & (!(is.null(run.parallel.cores))), run.parallel.cores, 1L)
 
-      ## Shift \tau parameter according to which part of signal x we are currently working with
-      if (nrow(out.df.i) > 0){
-        out.df.i$tau_i <- out.df.i$tau_i + i - 1
-        return(out.df.i)
+  out.list <- parallel::mclapply(x.cut.seq, function(i){
+    ## Define current x part indices
+    idx.i <- i : min((i + x.cut.vl + x.cut.margin), length(x))
+    ## If we cannot fit the longest pattern, return NULL
+    if (length(idx.i) <= max(template.vl)) return(NULL)
+    ## Compute similarity matrix
+    similarity.mat.i <- similarityMatrix(x = x.smoothed[idx.i],
+                                         template.scaled = template.scaled,
+                                         similarity.measure = similarity.measure)
+    ## Compute template index matrix
+    if (compute.template.idx){
+      template.idx.mat.i <- templateIdxMatrix(x = x.smoothed[idx.i],
+                                              template.scaled = template.scaled,
+                                              similarity.measure = similarity.measure)
+    }
+    else
+    {
+      template.idx.mat.i <- NULL
+    }
+    ## Run max and tine procedure
+    out.df.i <- maxAndTune(x = x[idx.i],
+                           template.vl = template.vl,
+                           similarity.mat = similarity.mat.i,
+                           similarity.measure.thresh = similarity.measure.thresh,
+                           template.idx.mat = template.idx.mat.i,
+                           finetune = finetune,
+                           finetune.maxima.x = finetune.maxima.x[idx.i],
+                           finetune.maxima.nbh.vl = finetune.maxima.nbh.vl)
 
-      } else {
-        ## Return empty data frame
-        return(data.frame(tau_i = numeric(),
-                          T_i = numeric(),
-                          sim_i = numeric(),
-                          template_i = numeric()))
-      }
+    ## Shift \tau parameter according to which part of signal x we are currently working with
+    if (nrow(out.df.i) > 0){
+      out.df.i$tau_i <- out.df.i$tau_i + i - 1
+      return(out.df.i)
 
-    })
-  })
-  out.list <- lapply(out.list.f, value)
-
+    } else {
+      ## Return empty data frame
+      return(data.frame(tau_i = numeric(),
+                        T_i = numeric(),
+                        sim_i = numeric(),
+                        template_i = numeric()))
+    }
+  }, mc.cores = getOption("mc.cores", mc.cores.val))
 
   ## ---------------------------------------------------------------------------
   ## Clear up after possibly multiple stride occurrences

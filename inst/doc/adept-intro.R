@@ -1,20 +1,20 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   cache = FALSE
 )
 
-## ---- eval = FALSE-------------------------------------------------------
+## ---- eval = FALSE------------------------------------------------------------
 #  # install.packages("devtools")
 #  devtools::install_github("martakarass/adept")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 library(adept)
 library(magrittr)
 library(ggplot2)
 
-## ---- fig.width=2.5, fig.height=2.3--------------------------------------
+## ---- fig.width=2.5, fig.height=2.3-------------------------------------------
 true.pattern <- cos(seq(0, 2 * pi, length.out = 100))
 x <- c(true.pattern[1], replicate(10, true.pattern[-1]))
 
@@ -22,12 +22,12 @@ data.frame(x = seq(0, 1, length.out = 100), y = true.pattern) %>%
   ggplot() + geom_line(aes(x = x, y = y), color = "red") + 
   theme_bw(base_size = 9) + labs(x = "Phase", y = "Value", title = "Pattern")
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 data.frame(x = seq(0, by = 0.01, length.out = length(x)), y = x) %>%
   ggplot() + geom_line(aes(x = x, y = y)) +  theme_bw(base_size = 9) + 
   labs(x = "Time [s]", y = "Value", title = "Time-series x")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -37,7 +37,7 @@ out <- segmentPattern(
   compute.template.idx = TRUE)
 out
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -47,7 +47,7 @@ out <- segmentPattern(
   compute.template.idx = TRUE)
 out
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 10,   ## Assumed data frequency of 10 observations per second
@@ -57,7 +57,7 @@ out <- segmentPattern(
   compute.template.idx = TRUE)
 out
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 set.seed(1)
 true.pattern <- cos(seq(0, 2 * pi, length.out = 200))
 x <- numeric()
@@ -111,7 +111,7 @@ out.plot1 <- function(val, out, fs = 100){
   plot(plt)
 }
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -123,7 +123,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -135,7 +135,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -147,7 +147,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 true.pattern.1 <- cos(seq(0, 2 * pi, length.out = 200))
 true.pattern.2 <- true.pattern.1
 true.pattern.2[70:130] <- 2 * true.pattern.2[min(70:130)] + abs(true.pattern.2[70:130])
@@ -167,7 +167,7 @@ data.frame(x = seq(0, by = 0.01, length.out = length(x)), y = x) %>%
   ggplot() + geom_line(aes(x = x, y = y)) +  theme_bw(base_size = 9) + 
   labs(x = "Time [s]", y = "Value", title = "Time-series x")
 
-## ---- fig.width=2.5, fig.height=2.3--------------------------------------
+## ---- fig.width=2.5, fig.height=2.3-------------------------------------------
 plt1 <- 
   data.frame(x = seq(0, 1, length.out = length(true.pattern.1)), y = true.pattern.1) %>%
   ggplot() + geom_line(aes(x = x, y = y), color = "red") + 
@@ -180,7 +180,7 @@ plt2 <-
   scale_y_continuous(limits = c(-1,1))
 plt1;plt2
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -192,7 +192,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -205,7 +205,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -217,7 +217,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 ## Generate `x` as a noisy version of a time-series generated in *Examples 3*.  
 set.seed(1)
 x <- x + rnorm(length(x), sd = 0.5)
@@ -226,7 +226,7 @@ data.frame(x = seq(0, by = 0.01, length.out = length(x)), y = x) %>%
   ggplot() + geom_line(aes(x = x, y = y), size = 0.3) +  theme_bw(base_size = 9) + 
   labs(x = "Time [s]", y = "Value", title = "Time-series x")
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -238,14 +238,14 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 x.smoothed <- windowSmooth(x = x, x.fs = 100, W = 0.1)
   
 data.frame(x = seq(0, by = 0.01, length.out = length(x.smoothed)), y = x.smoothed) %>%
   ggplot() + geom_line(aes(x = x, y = y)) +  theme_bw(base_size = 9) + 
   labs(x = "Time [s]", y = "Value", title = "Time-series x smoothed")
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -258,7 +258,7 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -272,14 +272,14 @@ out
 
 out.plot1(x, out)
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 x.smoothed.2 <- windowSmooth(x = x, x.fs = 100, W = 0.5)
 
 data.frame(x = seq(0, by = 0.01, length.out = length(x.smoothed.2)), y = x.smoothed.2) %>%
   ggplot() + geom_line(aes(x = x, y = y)) +  theme_bw(base_size = 9) + 
   labs(x = "Time [s]", y = "Value", title = "Time-series x smoothed aggresively")
 
-## ---- fig.width=7, fig.height=2.3----------------------------------------
+## ---- fig.width=7, fig.height=2.3---------------------------------------------
 out <- segmentPattern(
   x = x,
   x.fs = 100,
@@ -293,7 +293,7 @@ out <- segmentPattern(
   compute.template.idx = TRUE)
 out
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Function to plot nice results visualization 
 out.plot2 <- function(val, val.sm, out, fs = 100){
   yrange <- c(-1, 1) * max(abs(val))
@@ -338,6 +338,6 @@ out.plot2 <- function(val, val.sm, out, fs = 100){
   plot(plt)
 }
 
-## ---- fig.width=7, fig.height=3------------------------------------------
+## ---- fig.width=7, fig.height=3-----------------------------------------------
 out.plot2(x, windowSmooth(x = x, x.fs = 100, W = 0.5), out)
 

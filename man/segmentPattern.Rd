@@ -4,12 +4,23 @@
 \alias{segmentPattern}
 \title{Pattern Segmentation From a Time-series via ADEPT}
 \usage{
-segmentPattern(x, x.fs, template, pattern.dur.seq,
-  similarity.measure = "cov", similarity.measure.thresh = 0,
-  x.adept.ma.W = NULL, finetune = NULL, finetune.maxima.ma.W = NULL,
-  finetune.maxima.nbh.W = NULL, run.parallel = FALSE,
-  run.parallel.cores = NULL, x.cut = TRUE, x.cut.vl = 6000,
-  compute.template.idx = FALSE)
+segmentPattern(
+  x,
+  x.fs,
+  template,
+  pattern.dur.seq,
+  similarity.measure = "cov",
+  similarity.measure.thresh = 0,
+  x.adept.ma.W = NULL,
+  finetune = NULL,
+  finetune.maxima.ma.W = NULL,
+  finetune.maxima.nbh.W = NULL,
+  run.parallel = FALSE,
+  run.parallel.cores = 1L,
+  x.cut = TRUE,
+  x.cut.vl = 6000,
+  compute.template.idx = FALSE
+)
 }
 \arguments{
 \item{x}{A numeric vector. A time-series to segment pattern from.}
@@ -63,14 +74,12 @@ fine-tuning procedure. Expressed in seconds. Default is \code{NULL}.
 Note: if the length provided corresponds to an even number of \code{x} vector indices,
 it will be rounded down so as the corresponding number of vector indices is its closest odd number.}
 
-\item{run.parallel}{A logical scalar. Whether or not to use parallel execution in the algorithm.
-The \code{future} package
-is used to execute code asynchronously. Default is \code{FALSE}.}
+\item{run.parallel}{A logical scalar. Whether or not to use parallel execution in the algorithm
+with \code{parallel} package. Default is \code{FALSE}. DOES NOT WORK ON WINDOWS.}
 
 \item{run.parallel.cores}{An integer scalar.
-The number of cores to use for parallel execution.
-Default is \code{NULL}. If not specified, the number of cores is set to a number of
-cores available minus 1.}
+The number of cores to use for parallel execution. Defaults to 1L (no parallel).
+DOES NOT WORK ON WINDOWS.}
 
 \item{x.cut}{A logical scalar. Whether or not to use time optimization procedure in
 which a time-series \code{x} is cut into parts and segmentation is performed for
@@ -231,4 +240,10 @@ out <- segmentPattern(
   compute.template.idx = TRUE)
 out
 
+}
+\references{
+Karas, M., Straczkiewicz, M., Fadel, W., Harezlak, J., Crainiceanu, C.M.,
+Urbanek, J.K. (2019). Adaptive empirical pattern
+transformation (ADEPT) with application to walking stride segmentation.
+Biostatistics. https://doi.org/10.1093/biostatistics/kxz033
 }
